@@ -29,8 +29,9 @@ db.create_all()
 
 @app.route('/')
 def index():
-    person=Person.query.first()
-    return 'Hello'+person.name+'!'
+    jres=Person.query.join(Todos,Person.id==Todos.id).all();
+    print(jres)
+    return 'Hello'+ jres[0].description +'!'
 
 if __name__ == "__main__":
     app.run()
