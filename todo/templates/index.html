@@ -3,6 +3,11 @@
         <title>ToDo App</title>
     </head>
     <body>
+        <!-- common convention of creating the action url using our resource that is todos table and what we are doing on it -->
+        <form action="/todos/create" method="POST">
+            <input type="text" name="description">
+            <input type="submit" value="create">
+        </form>
         <ul>
             {% for d in data %}
             <li>{{ d.description }} </li>
