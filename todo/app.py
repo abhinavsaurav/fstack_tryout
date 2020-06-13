@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for
+# Need to import jsonify for returning the json data
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 
 app= Flask(__name__)
@@ -24,7 +25,12 @@ db.create_all()
 @app.route('/todos/create', methods=['POST'])
 def create_todo():
     # Also, the blank 2nd param is the default text passed if there is no data
-    description = request.form.get('description','')
+    ''' description = request.form.get('description','')         '''
+    
+    # Updated--to JSON--
+    # We will receive a json body on ajax req which we set as the body and the param will be description
+    # So we are accessing the dictionary
+    description=request.get_json()['description']
     
     # Forgot the description = description field
     todo = Todo(description=description)
@@ -35,7 +41,12 @@ def create_todo():
     # Also we are redirecting to the index function below so that it prints the data. 
     # It optionally takes in a second argument which index function might take like redirect(url_for('index'),data)
     # Also index might be taking a parameter data then like def index(data) 
-    return redirect(url_for('index'))
+    # return redirect(url_for('index'))
+    
+    # Returning the data as a JSON value. ALso need to import jsonify from flask
+    return jsonify({
+        'description': todo.description
+    })
     
 @app.route('/')
 def index():

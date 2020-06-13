@@ -1,17 +1,56 @@
 <html>
     <head>
         <title>ToDo App</title>
+        <style>
+            .hidden{
+                display: none;
+            }
+        </style>
     </head>
     <body>
         <!-- common convention of creating the action url using our resource that is todos table and what we are doing on it -->
-        <form action="/todos/create" method="POST">
-            <input type="text" name="description">
+        <form id="form">
+            <input type="text" id="description" name="description">
             <input type="submit" value="create">
         </form>
-        <ul>
+        <div id="error" class="hidden">Something Went Wrong!</div>
+        <ul id="todos">
             {% for d in data %}
             <li>{{ d.description }} </li>
             {% endfor %}
         </ul>
+    <script>
+        //Data fetched here is empty so it won't store any value better fetch it once the data is submitted
+        //  let descrip=document.getElementById('descr').value;
+        document.getElementById('form').onsubmit= function(e){
+            e.preventDefault();
+            let descrip=document.getElementById('description').value;
+            fetch('/todos/create',{
+                method:"POST",
+                body:JSON.stringify({
+                    'description':descrip
+                }),
+                headers:{
+                    'Content-Type':'application/json'
+                }
+            })
+            //Getting the response back from the server
+            .then( function(response){
+                return response.json();
+            })
+            // Extracting the json response
+            .then(function(jsonResponse){
+                console.log(jsonResponse);
+                let liElement=document.createElement('LI');
+                liElement.innerHTML=jsonResponse['description'];
+                document.getElementById('todos').appendChild(liElement);
+                //document.getElementById('error').classList.remove('hidden');
+                document.getElementById("error").className="hidden";
+            })
+            .catch(function(){
+                document.getElementById("error").className="";
+            })
+        };
+    </script>
     </body>
 </html>
