@@ -67,6 +67,8 @@ def check_completed(todo_id):
     try:
         completed= request.get_json()['completed']
         print('completed',completed)
+        
+        #  Watch we are taking reference for the line here of the class that;s why
         todo= Todo.query.get(todo_id)
         todo.completed = completed
         db.session.commit()
