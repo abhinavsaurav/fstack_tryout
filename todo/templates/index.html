@@ -7,6 +7,19 @@
             }
             li{
                 list-style-type: none;
+                width: 200px;
+                clear:both;
+            
+            }
+            li button{
+                -webkit-appearance: none;
+                border: none;
+                color: red;
+                outline: none;
+                float:right;
+                background: white;
+                cursor: pointer;
+                font-size: 22;
             }
         </style>
     </head>
@@ -19,12 +32,33 @@
         <div id="error" class="hidden">Something Went Wrong!</div>
         <ul id="todos">
             {% for d in data %}
-            <li><input type="checkbox" data-id="{{ d.id }}" class="check-completed" {% if d.completed %} checked {% endif %}/> {{ d.description }} </li>
+            <li>
+                <input type="checkbox" data-id="{{ d.id }}" class="check-completed" {% if d.completed %} checked {% endif %}/> 
+                {{ d.description }} 
+                <button data-id="{{ d.id }}" class="delete-button">&cross;</button>
+            </li>
             {% endfor %}
         </ul>
     <script>
+        const deletebuttons= document.querySelectorAll(".delete-button");
         const checkboxes= document.querySelectorAll(".check-completed");
         for (let i=0 ;i<checkboxes.length;i++){
+            const deletebtn=deletebuttons[i];
+            deletebtn.onclick= function(e){
+                console.log(e.target);
+                let id1=e.target.dataset['id'];
+                console.log(id1);
+                fetch('/todos/'+ id1 +'/delete-button',{
+                    method:'DELETE'
+                }).then(function() {
+                    document.getElementById('error').className = 'hidden';
+                    window.location="http://localhost:5000";
+                })
+                .catch(function() {
+                    document.getElementById('error').className = '';
+                });
+            };
+
             const checkbox= checkboxes[i];
             // On change of the state only this will get triggerred and set the newcompleted variable
             checkbox.onchange = function(e){
@@ -45,7 +79,7 @@
                 })
                 .catch(function() {
                     document.getElementById('error').className = '';
-                })
+                });
             }
         }
 
