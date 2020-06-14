@@ -1,6 +1,7 @@
 # Need to import jsonify for returning the json data
 from flask import Flask, render_template, request, redirect, url_for, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 import sys 
 
 app= Flask(__name__)
@@ -8,18 +9,24 @@ app.config['SQLALCHEMY_DATABASE_URI']='postgresql://postgres:password@localhost:
 
 db= SQLAlchemy(app)
 
+# For migrating, instance created of migrate
+migrate= Migrate(app,db)
+
 #Forgot about inheriting remember -----
 class Todo(db.Model):
     __tablename__ = "todos"
     id=db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(), nullable=False)
+    # New column added
+    completed = db.Column(db.Boolean, nullable=False, default=False)
     
     def __repr__(self):
         return f'< ID:{self.id}, Description: {self.description} >'
 
 
 #Don't forget this line too to make the database
-db.create_all()
+# DOn't need this while using migrations
+# db.create_all()
 
 
 # Remember >>> methods <<<<<< 
