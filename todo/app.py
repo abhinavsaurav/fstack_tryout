@@ -62,9 +62,23 @@ def create_todo():
     else:
         return jsonify(body)
     
+@app.route('/todos/<todo_id>/check-completed', methods=['POST'])
+def check_completed(todo_id):
+    try:
+        completed= request.get_json()['completed']
+        print('completed',completed)
+        todo= Todo.query.get(todo_id)
+        todo.completed = completed
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+    return redirect(url_for('index'))
+
 @app.route('/')
 def index():
-    return render_template('index.html',data=Todo.query.all())
+    return render_template('index.html',data=Todo.query.order_by(Todo.id).all())
                            
     # List of objects 
     # 
