@@ -21,6 +21,10 @@
                 cursor: pointer;
                 font-size: 22;
             }
+            .inline-wrap{
+                display: inline-block;
+                vertical-align: top;
+            }
         </style>
     </head>
     <body>
@@ -30,16 +34,26 @@
             <input type="submit" value="create">
         </form>
         <div id="error" class="hidden">Something Went Wrong!</div>
-        <ul id="todos">
-            {% for d in data %}
-            <li>
-                <input type="checkbox" data-id="{{ d.id }}" class="check-completed" {% if d.completed %} checked {% endif %}/> 
-                {{ d.description }} 
-                <button data-id="{{ d.id }}" class="delete-button">&cross;</button>
-            </li>
-            {% endfor %}
-        </ul>
-    <script>
+        <div id="listoftoods" class="inline-wrap">
+            <ul>
+                {% for list in lists %}
+                <li><a href="/lists/{{ list.id }}"> {{ list.name }} </a> </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="inline-wrap">
+            <h4>{{ active_list.name }}</h4>
+            <ul id="todos" >
+                {% for d in todos %}
+                <li>
+                    <input type="checkbox" data-id="{{ d.id }}" class="check-completed" {% if d.completed %} checked {% endif %}/> 
+                    {{ d.description }} 
+                    <button data-id="{{ d.id }}" class="delete-button">&cross;</button>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    <script> 
         const deletebuttons= document.querySelectorAll(".delete-button");
         const checkboxes= document.querySelectorAll(".check-completed");
         for (let i=0 ;i<checkboxes.length;i++){
@@ -52,6 +66,8 @@
                     method:'DELETE'
                 }).then(function() {
                     document.getElementById('error').className = 'hidden';
+                    // check for other way to implement this request without refreshing the thing
+                    // maybe i can do display none for this rn
                     window.location="http://localhost:5000";
                 })
                 .catch(function() {
@@ -105,9 +121,13 @@
             // Extracting the json response
             .then(function(jsonResponse){
                 console.log(jsonResponse);
+  
+                // Also, try to implement a checkbox for it
+
                 let liElement=document.createElement('LI');
                 liElement.innerHTML=jsonResponse['description'];
                 document.getElementById('todos').appendChild(liElement);
+  
                 //document.getElementById('error').classList.remove('hidden');
                 document.getElementById("error").className="hidden";
             })

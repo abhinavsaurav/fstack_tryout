@@ -12,6 +12,14 @@ db= SQLAlchemy(app)
 # For migrating, instance created of migrate
 migrate= Migrate(app,db)
 
+class TodoList(db.Model):
+    __tablename__="todolists"
+    id=db.Column(db.Integer,primary_key= True)
+    name= db.Column(db.String(), nullable=False)
+    # Bakcref means the name of the thing so while specifying it would be todos.list basically a name i guess
+    todos = db.relationship('Todo',backref='list', lazy=True)
+    
+
 #Forgot about inheriting remember -----
 class Todo(db.Model):
     __tablename__ = "todos"
@@ -19,6 +27,9 @@ class Todo(db.Model):
     description = db.Column(db.String(), nullable=False)
     # New column added
     completed = db.Column(db.Boolean, nullable=False, default=False)
+    # the todolists is the table name and id the column referencing it
+    # Also, foreign key constraint are by default not null but we like to be explicit here
+    list_id=db.Column(db.Integer, db.ForeignKey('todolists.id'), nullable=False)
     
     def __repr__(self):
         return f'< ID:{self.id}, Description: {self.description} >'
@@ -92,18 +103,17 @@ def delete_todos(todo_id):
         db.session.close()
     return jsonify({'success':True})
 
+@app.route('/lists/<list_id>')
+def get_list_todos(list_id):
+    # Adding lists as exrea and modifying todos
+    return render_template('index.html',
+                        lists=TodoList.query.all() ,
+                        active_list=TodoList.query.get(list_id),
+                        todos=Todo.query.filter_by(list_id=list_id).order_by(Todo.id)
+                        .all())
+                           
 @app.route('/')
 def index():
-    return render_template('index.html',data=Todo.query.order_by(Todo.id).all())
-                           
-    # List of objects 
-    # 
-    # data=[{
-    #     'description':"todo1"
-    # },{
-    #     'description':'todo2'
-    # },{
-    #     'description':'todos3'
-    # }])
-    
+    return redirect(url_for('get_list_todos',list_id=1))
+
     
