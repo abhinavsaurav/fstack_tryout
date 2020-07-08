@@ -19,7 +19,6 @@ def get_token_auth_header():
 # creating decorator for getting the authorization token 
 # it makes thing more convinent now we don't have to pass any more value 
 # we just need to add the @requires_auth header and use the param jwt to get the received value
-
 def requires_auth(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
