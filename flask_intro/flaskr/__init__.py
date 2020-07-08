@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 import os
-from models import setup_db,Plant
+from flaskr.models import setup_db,Plant
 from flask_cors import CORS
 
 
@@ -35,6 +35,19 @@ def create_app(test_config=None):
         return jsonify({"hello":"world"})
     
     @app.route('/')
+    def index():
+        return jsonify({
+            "success":True
+        })
     
+    # error response handler
+    
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            "success":False,
+            "error":404,
+            "message":"resource not found"
+        }), 404
     
     return app
