@@ -45,18 +45,29 @@ def get_token_auth_header():
 
     return auth_token[1]
 
-# Code provided by AUTH0 for verification 
+# Code for verification
 def verify_decode_jwt(token):
+    # we are fetching public key here using our domain and hitting the endpoint
+    # It gives us a set of information for which we have to check if some info is present
+    # This information resides in the header of the JWT
+    
+    # uses the public key
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
     jwks = json.loads(jsonurl.read())
+    
+    # Now we are fetching our kid (key ID i guess) from the token 
+    # Bascially we are doing a public-private key match i guess 
     unverified_header = jwt.get_unverified_header(token)
     rsa_key = {}
+    
+    # If no kid is found that means its invalid we need it
     if 'kid' not in unverified_header:
         raise AuthError({
             'code': 'invalid_header',
             'description': 'Authorization malformed.4'
         }, 401)
 
+    # We are now matching the keys here and then storing the values if it matches then we store its corresponding details
     for key in jwks['keys']:
         if key['kid'] == unverified_header['kid']:
             rsa_key = {
